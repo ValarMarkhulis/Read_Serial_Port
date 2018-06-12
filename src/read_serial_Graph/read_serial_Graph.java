@@ -106,7 +106,7 @@ public class read_serial_Graph {
         
         
         vindue.setVisible(true);
-        
+        //Kommentar
         
     }
 
