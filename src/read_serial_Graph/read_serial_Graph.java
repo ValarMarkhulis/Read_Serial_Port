@@ -3,6 +3,7 @@ import com.fazecast.jSerialComm.*;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.InputStream;
 import java.util.Scanner;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -61,11 +62,13 @@ public class read_serial_Graph {
                 if(tilslutknap.getText().equals("Tilslut")){
                     //Tilslut
                     valgteport = SerialPort.getCommPort(portlist.getSelectedItem().toString());
-                    valgteport.setComPortTimeouts(SerialPort.TIMEOUT_SCANNER, 0, 0);
+                    valgteport.setBaudRate(19200);
                     if(valgteport.openPort()){
                         System.out.println("Porten blev opsat korrekt");
                         tilslutknap.setText("Afbryd");
                         portlist.setEnabled(false);
+                        valgteport.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 100, 0);
+
                     }else{
                         try {
                             //System.out.println("");
@@ -80,16 +83,22 @@ public class read_serial_Graph {
                     // Lav en ny thread og læg data i grafen
                     Thread thread = new Thread(){
                         @Override public void run(){
-                            Scanner scanner = new Scanner(valgteport.getInputStream());
-                            while(scanner.hasNextLine()){
+                            InputStream in = valgteport.getInputStream();
+                            while(true){
                                 try{
+                                    Thread.sleep(50);
+                                    /*
                                     String line = scanner.nextLine();
                                     int number = Integer.parseInt(line);
-                                    series.add(x++,number);
-                                    vindue.repaint();
+                                    */
+                                    while(in.available() != 0) {
+                                        series.add(x++,in.read());
+                                        vindue.repaint();
+                                    }
+                                    
                                 }catch(Exception e){}
                             }
-                            scanner.close();
+                            //scanner.close();
                         }
                     };
                     thread.start();

@@ -1,6 +1,9 @@
 package read_serial_port;
 import com.fazecast.jSerialComm.*;
+import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Scanner;
+import java.util.Set;
 import javax.swing.JFrame;
 import javax.swing.JSlider;
 
@@ -10,18 +13,18 @@ import javax.swing.JSlider;
  */
 public class Read_Serial_Port {
 
-    /**
-     * @param args the command line arguments
-     */
+    static SerialPort port;
+    
     public static void main(String[] args) {
         JFrame vindue = new JFrame();
         JSlider slider = new JSlider();
-        slider.setMaximum(1023);
+        slider.setMaximum(127);
         vindue.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // reagér på luk
         vindue.add(slider);
         vindue.pack();
         vindue.setVisible(true);
        
+        
         SerialPort ports[] = SerialPort.getCommPorts();
         System.out.println("Vælg en COM port: ");
         
@@ -32,10 +35,15 @@ public class Read_Serial_Port {
         Scanner tastatur = new Scanner(System.in);
         
         int valg= 0;
-        SerialPort port = null;
+        
         valg = tastatur.nextInt();
         port = ports[valg - 1];
         
+        
+        
+        //port = SerialPort.getCommPort("COM6");
+        
+        port.setBaudRate(19200);
         
         if(port.openPort()){
             System.out.println("Porten blev opsat korrekt");
@@ -43,17 +51,54 @@ public class Read_Serial_Port {
             System.out.println("Porten kunne ikke åbnes korrekt, prøv igen!");
         }
         
-        port.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
         
-        Scanner data = new Scanner(port.getInputStream());
-        while(data.hasNextLine()){
-            int nummer = 0;
-            try {
-                nummer = Integer.parseInt(data.nextLine());
-            } catch (Exception e) {
+        port.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 100, 0);
+        
+        InputStream in = port.getInputStream();
+        while(true) {
+        try{
+            Thread.sleep(50);
+            while(in.available() != 0){
+                
+                /*
+                byte[] readBuffer = new byte[port.bytesAvailable()];
+                int numBytes = port.readBytes(readBuffer, readBuffer.length);
+                //String data = new String(readBuffer, "UTF-8");
+                System.out.println("Bytes: " + numBytes + "Data: " + readBuffer);
+                */
+                System.out.println((char)in.read());
+                slider.setValue((int)in.read());
             }
-            slider.setValue(nummer);
+        } catch(Exception e) {
+           e.printStackTrace();
         }
+        }
+        /*
+        Scanner scanner = new Scanner(port.getInputStream());
+        while(scanner.hasNext()){
+            try{
+                String line = scanner.nextLine();
+                int number = Integer.parseInt(line);
+                System.out.println(number);
+            }catch(Exception e){}
+        }
+        port.closePort();
+        */
+        
+        
+        /*
+        //SerialPort comPort = SerialPort.getCommPorts()[0];
+        //comPort.openPort();
+        port.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 100, 0);
+        InputStream in = port.getInputStream();
+        try
+        {
+           for (int j = 0; j < 1000; ++j)
+              System.out.print((char)in.read());
+           in.close();
+        } catch (Exception e) { e.printStackTrace(); }
+        port.closePort();
+                */
     }
-
 }
+
