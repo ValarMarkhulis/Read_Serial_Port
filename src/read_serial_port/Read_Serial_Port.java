@@ -12,7 +12,7 @@ import javax.swing.JSlider;
 
 /**
  *
- * @author Christian Mark
+ * @author Taget fra samme gut: https://www.youtube.com/watch?v=cw31L_OwX3A
  */
 public class Read_Serial_Port {
 
