@@ -43,8 +43,10 @@ public class Boldprogram {
 
         g = f.getGraphics();
 
+        
         // VÆLGER PORT.
         SerialPort ports[] = SerialPort.getCommPorts();
+        /*
         System.out.println("Vælg en COM port: ");
         int i = 1;
         for (SerialPort port : ports) {
@@ -54,6 +56,8 @@ public class Boldprogram {
         int valg = 0;
         valg = tastatur.nextInt();
         valgteport = ports[valg - 1];
+        */
+        valgteport = ports[2 - 1];
 
         // Opsætter port
         valgteport.setComPortParameters(19200, 8, 1, 0);
@@ -76,24 +80,26 @@ public class Boldprogram {
                 int y = 0;
 
                 public void run() {
+                    // Start signal til LC-3 computeren
+                    try{
+                        buffer = besked.getBytes("ISO-8859-1");
+                    }catch(Exception e){}
+
                     while (true) {
                         try {
-                            // Start signal til LC-3 computeren
-                            buffer = besked.getBytes("ISO-8859-1");
 
                             //Send start signal
                             valgteport.writeBytes(buffer, besked.length());
                             out.flush();
 
-                            Thread.sleep(100);
+                            //Thread.sleep(100);
 
                             //Læs x-koordinatet
-                            //while (in.available() != 0) {
                             ciffer1 = in.read();
                             ciffer10 = in.read() << 5;
                             samlet = ciffer10 + ciffer1;
                             System.out.println("x:" + samlet);
-                            //}
+                            
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -103,13 +109,11 @@ public class Boldprogram {
                         try {
                             Thread.sleep(100);
 
-                            //Læs y-koordinatet
-                            //while (in.available() != 0) {
-                            ciffer1 = in.read();
-                            ciffer10 = in.read() << 5;
-                            samlet = ciffer10 + ciffer1;
-                            System.out.println("y:" + samlet);
-                            //}
+                        //Læs y-koordinatet
+                        ciffer1 = in.read();
+                        ciffer10 = in.read() << 5;
+                        samlet = ciffer10 + ciffer1;
+                        System.out.println("y:" + samlet);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
