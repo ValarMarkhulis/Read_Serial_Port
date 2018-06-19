@@ -4,6 +4,10 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -87,24 +91,41 @@ public class read_serial_Graph {
                     Thread thread = new Thread(){
                         @Override public void run(){
                             InputStream in = valgteport.getInputStream();
+                            OutputStream out = valgteport.getOutputStream();
                             int ciffer1 = 0;
                             int ciffer10 = 0;
                             int samlet = 0;
+                            byte[] buffer = null;
+                            String besked = "c";
+                            try {
+                                buffer = besked.getBytes("ISO-8859-1");
+                            } catch (UnsupportedEncodingException ex) {
+                                ex.printStackTrace();
+                            }
+                            
                             while(true){
                                 try{
                                     Thread.sleep(50);
-                                    /*
-                                    String line = scanner.nextLine();
-                                    int number = Integer.parseInt(line);
-                                    */
-                                    while(in.available() != 0) {
-                                        ciffer1 = in.read();
-                                        ciffer10 = in.read()<<5;
-                                        samlet = ciffer10+ciffer1;
-                                        System.out.println(""+samlet);
-                                        xKordinater.add(x++,samlet);
-                                        vindue.repaint();
-                                    }
+                                    
+                                    //Sender start signalet til LC-3'en
+                                    valgteport.writeBytes(buffer, besked.length());
+                                    out.flush();
+                                    
+                                    // Indlæser x-koordinatet
+                                    ciffer1 = in.read();
+                                    ciffer10 = in.read()<<5;
+                                    samlet = ciffer10+ciffer1;
+                                    System.out.println(""+samlet);
+                                    xKordinater.add(x++,samlet);
+                                    
+                                    // Indlæser y-koordinatet
+                                    ciffer1 = in.read();
+                                    ciffer10 = in.read()<<5;
+                                    samlet = ciffer10+ciffer1;
+                                    System.out.println(""+samlet);
+                                    yKordinater.add(x++,samlet);                                    
+                                    vindue.repaint();
+                                    //}
                                     
                                 }catch(Exception e){}
                             }
@@ -118,6 +139,8 @@ public class read_serial_Graph {
                     tilslutknap.setText("Tilslut");
                     portlist.setEnabled(true);
                     xKordinater.clear();
+                    yKordinater.clear();
+                    
                     x = 0;
                 }
             }
