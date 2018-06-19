@@ -11,11 +11,15 @@ public class Bold {
 	{
             g = g1;
             x = x1;
-            if(y1 < 820){
-                y = y1;
-            }else{
-                y = 820;
-            }
+            y = y1;
+            
+            
+            
+//            if(y1 < 820){
+//                y = y1;
+//            }else{
+//                y = 820;
+//            }
             
 
             g.setColor(Color.BLACK);
