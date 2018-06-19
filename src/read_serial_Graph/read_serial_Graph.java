@@ -49,8 +49,12 @@ public class read_serial_Graph {
         }
         
         // Lav Grafen
-        XYSeries series = new XYSeries("Værdier modtaget fra serial porten");
-        XYSeriesCollection dataset = new XYSeriesCollection(series);
+        XYSeries xKordinater = new XYSeries("X koordinaterne ");
+        XYSeries yKordinater = new XYSeries("Y koordinaterne ");
+        
+        XYSeriesCollection dataset = new XYSeriesCollection(xKordinater);
+        dataset.addSeries(yKordinater);
+        
         JFreeChart chart = ChartFactory.createXYLineChart("Værdier modtaget fra serial porten", "Tid", "Værdier", dataset);
         vindue.add(new ChartPanel(chart), BorderLayout.CENTER);
         
@@ -98,7 +102,7 @@ public class read_serial_Graph {
                                         ciffer10 = in.read()<<5;
                                         samlet = ciffer10+ciffer1;
                                         System.out.println(""+samlet);
-                                        series.add(x++,samlet);
+                                        xKordinater.add(x++,samlet);
                                         vindue.repaint();
                                     }
                                     
@@ -113,7 +117,7 @@ public class read_serial_Graph {
                     valgteport.closePort();
                     tilslutknap.setText("Tilslut");
                     portlist.setEnabled(true);
-                    series.clear();
+                    xKordinater.clear();
                     x = 0;
                 }
             }
