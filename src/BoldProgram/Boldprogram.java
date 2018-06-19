@@ -36,14 +36,13 @@ public class Boldprogram {
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // reagér på luk
         //f.setSize(400, 150);
         f.setBackground(Color.BLACK);
-        
-        f.setExtendedState(JFrame.MAXIMIZED_BOTH); 
+
+        f.setExtendedState(JFrame.MAXIMIZED_BOTH);
         f.setUndecorated(true);
         f.setVisible(true);
 
         g = f.getGraphics();
 
-        
         // VÆLGER PORT.
         SerialPort ports[] = SerialPort.getCommPorts();
         /*
@@ -56,7 +55,7 @@ public class Boldprogram {
         int valg = 0;
         valg = tastatur.nextInt();
         valgteport = ports[valg - 1];
-        */
+         */
         valgteport = ports[2 - 1];
 
         // Opsætter port
@@ -78,12 +77,15 @@ public class Boldprogram {
                 String besked = "c";
                 int x = 0;
                 int y = 0;
+                int last_x = 512;
+                int last_y = 512;
 
                 public void run() {
                     // Start signal til LC-3 computeren
-                    try{
+                    try {
                         buffer = besked.getBytes("ISO-8859-1");
-                    }catch(Exception e){}
+                    } catch (Exception e) {
+                    }
 
                     while (true) {
                         try {
@@ -93,39 +95,51 @@ public class Boldprogram {
                             out.flush();
 
                             //Thread.sleep(100);
-
                             //Læs x-koordinatet
                             ciffer1 = in.read();
                             ciffer10 = in.read() << 5;
                             samlet = ciffer10 + ciffer1;
                             System.out.println("x:" + samlet);
-                            
+
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
 
-                        x = samlet;
+                        x = ((samlet - 512) / 10) + last_x;
+                        if (x < 0) {
+                            x = 0;
+                        } else if (x > f.getWidth()-50) {
+                            x = f.getWidth()-50;
+                        }
+                        last_x = x;
 
                         try {
                             Thread.sleep(100);
 
-                        //Læs y-koordinatet
-                        ciffer1 = in.read();
-                        ciffer10 = in.read() << 5;
-                        samlet = ciffer10 + ciffer1;
-                        System.out.println("y:" + samlet);
+                            //Læs y-koordinatet
+                            ciffer1 = in.read();
+                            ciffer10 = in.read() << 5;
+                            samlet = ciffer10 + ciffer1;
+                            System.out.println("y:" + samlet);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
 
-                        y = samlet;
+                        y = ((samlet - 512) / 10) + last_y;
+                        
+                        if (y < 0) {
+                            y = 0;
+                        } else if (y > f.getHeight()-50) {
+                            y = f.getHeight()-50;
+                        }
+                        last_y = y;
                         f.repaint();
                         try {
                             Thread.sleep(20);
                         } catch (InterruptedException ex) {
                             ex.printStackTrace();
                         }
-                        
+
                         new Bold(g, x, y);
                         try {
                             Thread.sleep(20);
