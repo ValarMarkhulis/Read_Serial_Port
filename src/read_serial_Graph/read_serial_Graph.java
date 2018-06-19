@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.InputStream;
-import java.util.Scanner;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -84,6 +83,9 @@ public class read_serial_Graph {
                     Thread thread = new Thread(){
                         @Override public void run(){
                             InputStream in = valgteport.getInputStream();
+                            int ciffer1 = 0;
+                            int ciffer10 = 0;
+                            int samlet = 0;
                             while(true){
                                 try{
                                     Thread.sleep(50);
@@ -92,7 +94,11 @@ public class read_serial_Graph {
                                     int number = Integer.parseInt(line);
                                     */
                                     while(in.available() != 0) {
-                                        series.add(x++,in.read());
+                                        ciffer1 = in.read();
+                                        ciffer10 = in.read()<<5;
+                                        samlet = ciffer10+ciffer1;
+                                        System.out.println(""+samlet);
+                                        series.add(x++,samlet);
                                         vindue.repaint();
                                     }
                                     

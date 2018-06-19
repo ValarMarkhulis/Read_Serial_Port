@@ -39,6 +39,14 @@ public class TX_SERIAL {
 
         beskeder_out.setColumns(20);
         beskeder_out.setAutoscrolls(true);
+        
+        
+        JButton kanal2 = new JButton();
+        JFrame vindue2 = new JFrame();
+        vindue2.add(kanal2);
+        vindue2.setVisible(true);
+        vindue2.setSize(100, 100);
+        
 
         JTextArea beskeder_in = new JTextArea();
         beskeder_in.setEditable(false);
@@ -129,12 +137,21 @@ public class TX_SERIAL {
                                 while (tilslutknap.getText().equals("Afbryd")) {
                                     try {
                                         Thread.sleep(50);
+                                        int ciffer10= 0;
+                                        int ciffer1 = 0;
+                                        int test_total =0;
                                         char karakter = 0;
 
                                         //Læs så længe at der er data at læse
                                         while (in.available() != 0) {
-                                            karakter = (char) in.read();
+                                            ciffer1 = in.read();
+                                            ciffer10 = in.read()<<5;
+                                            int samlet =  ciffer10+ciffer1;
+                                            System.out.println(""+samlet);
                                             
+                                            
+                                            /*
+                                            karakter = (char) test;
                                             if(karakter == 8){
                                                 ModtagetBesked = ModtagetBesked.substring(0, ModtagetBesked.length()-1);
                                                 throw new Exception("Backspace");
@@ -146,7 +163,8 @@ public class TX_SERIAL {
                                             /*if (karakter < 32 || karakter > 255) {
                                                 throw new Exception("Ugyldig ASCII-værdi modtaget");
                                             }*/
-
+                                            
+                                            /*
                                             if (ModtagetBesked.length() > 100) {
                                                 ModtagetBesked = ModtagetBesked.substring(ModtagetBesked.indexOf("\n") + 1);
                                                 while (ModtagetBesked.startsWith("\n")) {
@@ -155,9 +173,16 @@ public class TX_SERIAL {
                                             } else {
                                                 ModtagetBesked = ModtagetBesked + karakter;
                                             }
-
+                                            */
                                             
-                                            //System.out.println("Printet noget til skærmen");
+                                            if (ModtagetBesked.length() > 100) {
+                                                ModtagetBesked = ModtagetBesked.substring(ModtagetBesked.indexOf("\n") + 1);
+                                                while (ModtagetBesked.startsWith("\n")) {
+                                                    ModtagetBesked = ModtagetBesked.substring(ModtagetBesked.indexOf("\n") + 1);
+                                                }
+                                            } else {
+                                                ModtagetBesked = ModtagetBesked + samlet+ "\n";
+                                            }
                                         }
                                     } catch (Exception e) {
                                     }
@@ -237,7 +262,21 @@ public class TX_SERIAL {
                 }
             }
         });
-
+        
+        kanal2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                out = valgteport.getOutputStream();
+                try{
+                    String besked = "c";
+                    byte[] buffer = besked.getBytes("ISO-8859-1");
+                    valgteport.writeBytes(buffer, besked.length());
+                    out.flush();
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
+        });
         vindue.setVisible(true);
     }
 }
