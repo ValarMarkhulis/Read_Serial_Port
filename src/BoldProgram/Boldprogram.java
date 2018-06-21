@@ -32,6 +32,26 @@ public class Boldprogram {
     static Graphics g;
 
     public static void main(String[] arg) {
+        // VÆLGER PORT.
+        SerialPort ports[] = SerialPort.getCommPorts();
+        
+        System.out.println("Vælg en COM port: ");
+        int i = 1;
+        for (SerialPort port : ports) {
+            System.out.println(i++ + ". " + port.getSystemPortName());
+        }
+        Scanner tastatur = new Scanner(System.in);
+        int valg = 0;
+        valg = tastatur.nextInt();
+        valgteport = ports[valg - 1];
+        
+        // Brug denne linje hvis du ved hvilken port på array'et at UART'en bruger.
+        //valgteport = ports[0];
+
+        // Opsætter port
+        valgteport.setComPortParameters(19200, 8, 1, 0);
+        
+        // Åbner vinduet.
         final JFrame f = new JFrame();
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // reagér på luk
         //f.setSize(400, 150);
@@ -42,24 +62,7 @@ public class Boldprogram {
         f.setVisible(true);
 
         g = f.getGraphics();
-
-        // VÆLGER PORT.
-        SerialPort ports[] = SerialPort.getCommPorts();
-        /*
-        System.out.println("Vælg en COM port: ");
-        int i = 1;
-        for (SerialPort port : ports) {
-            System.out.println(i++ + ". " + port.getSystemPortName());
-        }
-        Scanner tastatur = new Scanner(System.in);
-        int valg = 0;
-        valg = tastatur.nextInt();
-        valgteport = ports[valg - 1];
-         */
-        valgteport = ports[2 - 1];
-
-        // Opsætter port
-        valgteport.setComPortParameters(19200, 8, 1, 0);
+                
 
         if (valgteport.openPort()) {
             System.out.println("Porten blev opsat korrekt");
@@ -105,7 +108,10 @@ public class Boldprogram {
                             e.printStackTrace();
                         }
 
-                        x = ((samlet - 512) / 10) + last_x;
+                        //x = ((samlet - 512) / 10) + last_x;
+                        x = (((samlet - 512) / 10) * (-1)) + last_x;
+                        
+                        
                         if (x < 0) {
                             x = 0;
                         } else if (x > f.getWidth()-50) {
